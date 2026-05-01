@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0a0a">
+<link rel="manifest" href="/manifest.json">
+<title>Alfonso's Apps</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface-2: #1c1c1c;
+    --surface-3: #242424;
+    --border: #2a2a2a;
+    --text: #f0f0f0;
+    --text-dim: #888;
+    --text-muted: #555;
+    --accent: #8b5cf6;
+    --accent-soft: rgba(139, 92, 246, 0.12);
+    --green: #22c55e;
+    --blue: #3b82f6;
+    --orange: #f97316;
+    --pink: #ec4899;
+    --radius: 20px;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Subtle background pattern */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(139, 92, 246, 0.06) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(59, 130, 246, 0.04) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 60px 24px 80px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .header {
+    margin-bottom: 48px;
+  }
+
+  .greeting {
+    font-size: 14px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .header h1 {
+    font-size: 36px;
+    font-weight: 900;
+    letter-spacing: -1px;
+    line-height: 1.1;
+  }
+
+  .header h1 .highlight {
+    background: linear-gradient(135deg, var(--accent), #c084fc, var(--blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .header .subtitle {
+    color: var(--text-dim);
+    font-size: 15px;
+    margin-top: 12px;
+    line-height: 1.5;
+  }
+
+  /* Stats bar */
+  .stats {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 40px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stat {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+
+  .stat-num {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--accent);
+  }
+
+  .stat-label {
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  /* Section */
+  .section-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 600;
+    margin-bottom: 16px;
+  }
+
+  /* App grid */
+  .app-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 40px;
+  }
+
+  .app-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .app-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(139, 92, 246, 0.1);
+  }
+
+  .app-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: var(--card-accent, var(--accent));
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+
+  .app-card:hover::before {
+    opacity: 1;
+  }
+
+  .app-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    margin-bottom: 16px;
+  }
+
+  .app-name {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .app-desc {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.5;
+    margin-bottom: 16px;
+  }
+
+  .app-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .app-tag {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: 500;
+  }
+
+  .tag-live {
+    background: rgba(34, 197, 94, 0.12);
+    color: var(--green);
+  }
+
+  .tag-wip {
+    background: rgba(249, 115, 22, 0.12);
+    color: var(--orange);
+  }
+
+  .tag-new {
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+
+  .tag-category {
+    background: var(--surface-3);
+    color: var(--text-dim);
+  }
+
+  /* Coming soon card */
+  .app-card.coming-soon {
+    border-style: dashed;
+    opacity: 0.5;
+    cursor: default;
+  }
+
+  .app-card.coming-soon:hover {
+    transform: none;
+    border-color: var(--border);
+    box-shadow: none;
+  }
+
+  /* Agent section */
+  .agents-section {
+    margin-top: 8px;
+  }
+
+  .agent-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 12px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.2s;
+  }
+
+  .agent-card:hover {
+    border-color: var(--accent);
+    background: var(--surface-2);
+  }
+
+  .agent-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .agent-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .agent-name {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+
+  .agent-desc {
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  .agent-channel {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+    margin-top: 48px;
+  }
+
+  .footer p {
+    color: var(--text-muted);
+    font-size: 12px;
+    line-height: 1.8;
+  }
+
+  .footer .philosophy {
+    color: var(--text-dim);
+    font-style: italic;
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  /* Mobile */
+  @media (max-width: 600px) {
+    .container { padding: 40px 16px 60px; }
+    .header h1 { font-size: 28px; }
+    .app-grid { grid-template-columns: 1fr; }
+    .stats { gap: 16px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="header">
+    <p class="greeting">Alfonso's Workshop</p>
+    <h1>My <span class="highlight">Apps</span></h1>
+    <p class="subtitle">Vibe coded with taste. Built with AI, shipped for real.</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat">
+      <span class="stat-num" id="appCount">1</span>
+      <span class="stat-label">app</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num" id="agentCount">3</span>
+      <span class="stat-label">agents</span>
+    </div>
+    <div class="stat">
+      <span class="stat-num">0</span>
+      <span class="stat-label">lines of code written by hand</span>
+    </div>
+  </div>
+
+  <!-- APPS -->
+  <p class="section-label">Apps</p>
+  <div class="app-grid">
+
+    <a href="/apps/dj-set-tracker/" class="app-card" style="--card-accent: var(--accent);">
+      <div class="app-icon" style="background: var(--accent-soft);">🎧</div>
+      <div class="app-name">Set Tracker</div>
+      <div class="app-desc">Paste a YouTube DJ set link, get the full tracklist.</div>
+      <div class="app-meta">
+        <span class="app-tag tag-live">Live</span>
+        <span class="app-tag tag-new">New</span>
+        <span class="app-tag tag-category">Music</span>
+      </div>
+    </a>
+
+    <div class="app-card coming-soon">
+      <div class="app-icon" style="background: var(--surface-3);">🔮</div>
+      <div class="app-name">Next app</div>
+      <div class="app-desc">What will you build? One prompt away.</div>
+      <div class="app-meta">
+        <span class="app-tag tag-wip">Soon</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- AGENTS -->
+  <p class="section-label">Agents</p>
+  <div class="agents-section">
+
+    <a href="https://t.me/optima_tracker_bot" class="agent-card" target="_blank">
+      <div class="agent-icon" style="background: rgba(34, 197, 94, 0.12);">📊</div>
+      <div class="agent-info">
+        <div class="agent-name">Optima Tracker</div>
+        <div class="agent-desc">Sales prospect tracking with daily 8am summaries</div>
+      </div>
+      <div class="agent-channel">📱 Telegram</div>
+    </a>
+
+    <a href="https://t.me/optima_lead_intel_bot" class="agent-card" target="_blank">
+      <div class="agent-icon" style="background: rgba(59, 130, 246, 0.12);">🔍</div>
+      <div class="agent-info">
+        <div class="agent-name">Lead Intelligence</div>
+        <div class="agent-desc">Research any inmobiliaria — portals, decision-maker, tech stack, outreach</div>
+      </div>
+      <div class="agent-channel">📱 Telegram</div>
+    </a>
+
+    <a href="https://t.me/dj_set_tracker_bot" class="agent-card" target="_blank">
+      <div class="agent-icon" style="background: var(--accent-soft);">🎵</div>
+      <div class="agent-info">
+        <div class="agent-name">DJ Set Tracker</div>
+        <div class="agent-desc">Send a YouTube set link, get the tracklist back</div>
+      </div>
+      <div class="agent-channel">📱 Telegram</div>
+    </a>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <p class="philosophy">"It is no longer about who can write the best code, but who has the clearest vision and the highest taste." — Naval</p>
+    <p>Built by Alfonso Diaz &middot; Vibe coded &middot; 2026</p>
+  </div>
+
+</div>
+
+</body>
+</html>

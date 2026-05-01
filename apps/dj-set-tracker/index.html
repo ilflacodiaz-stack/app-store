@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Set Tracker — DJ Set Tracklist Finder</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface-2: #1e1e1e;
+    --border: #2a2a2a;
+    --text: #f0f0f0;
+    --text-dim: #888;
+    --accent: #8b5cf6;
+    --accent-glow: rgba(139, 92, 246, 0.15);
+    --green: #22c55e;
+    --red: #ef4444;
+    --yellow: #eab308;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Subtle grid background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(139, 92, 246, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(139, 92, 246, 0.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 60px 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+
+  .logo {
+    font-size: 48px;
+    margin-bottom: 8px;
+  }
+
+  .header h1 {
+    font-size: 32px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 8px;
+  }
+
+  .header h1 span {
+    background: linear-gradient(135deg, var(--accent), #c084fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .header p {
+    color: var(--text-dim);
+    font-size: 15px;
+  }
+
+  /* Search box */
+  .search-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 32px;
+    transition: border-color 0.3s;
+  }
+
+  .search-box:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px var(--accent-glow);
+  }
+
+  .input-row {
+    display: flex;
+    gap: 12px;
+  }
+
+  .input-row input {
+    flex: 1;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    color: var(--text);
+    font-size: 15px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .input-row input::placeholder {
+    color: #555;
+  }
+
+  .input-row input:focus {
+    border-color: var(--accent);
+  }
+
+  .btn {
+    background: var(--accent);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 14px 24px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+
+  .btn:hover {
+    background: #7c3aed;
+    transform: translateY(-1px);
+  }
+
+  .btn:active {
+    transform: translateY(0);
+  }
+
+  .btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .hint {
+    margin-top: 12px;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  .hint code {
+    background: var(--surface-2);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+  }
+
+  /* Status */
+  .status {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 24px;
+    font-size: 14px;
+  }
+
+  .status.visible { display: flex; }
+
+  .spinner {
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .status-text { color: var(--text-dim); }
+
+  /* Video info card */
+  .video-info {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+
+  .video-info.visible { display: block; }
+
+  .video-thumb {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+  }
+
+  .video-meta {
+    padding: 20px;
+  }
+
+  .video-meta h3 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    line-height: 1.4;
+  }
+
+  .video-meta .channel {
+    color: var(--text-dim);
+    font-size: 13px;
+  }
+
+  /* Tracklist */
+  .tracklist {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .tracklist.visible { display: block; }
+
+  .tracklist-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .tracklist-header h2 {
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .track-count {
+    background: var(--accent-glow);
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+  }
+
+  .track-list {
+    list-style: none;
+    max-height: 600px;
+    overflow-y: auto;
+  }
+
+  .track-list::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .track-list::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .track-list::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+  }
+
+  .track-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 24px;
+    border-bottom: 1px solid var(--border);
+    transition: background 0.15s;
+  }
+
+  .track-item:last-child {
+    border-bottom: none;
+  }
+
+  .track-item:hover {
+    background: var(--surface-2);
+  }
+
+  .track-num {
+    color: var(--text-dim);
+    font-size: 13px;
+    font-weight: 600;
+    min-width: 28px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .track-info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .track-artist {
+    font-weight: 600;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .track-title {
+    color: var(--text-dim);
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+  }
+
+  .track-time {
+    color: var(--text-dim);
+    font-size: 12px;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  /* Copy button */
+  .copy-btn {
+    background: var(--surface-2);
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin: 16px 24px 20px;
+  }
+
+  .copy-btn:hover {
+    color: var(--text);
+    border-color: var(--accent);
+  }
+
+  /* Error */
+  .error {
+    display: none;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    color: var(--red);
+    font-size: 14px;
+  }
+
+  .error.visible { display: block; }
+
+  /* No results */
+  .no-results {
+    display: none;
+    text-align: center;
+    padding: 48px 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+  }
+
+  .no-results.visible { display: block; }
+
+  .no-results .icon { font-size: 48px; margin-bottom: 16px; }
+
+  .no-results h3 {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 8px;
+  }
+
+  .no-results p {
+    color: var(--text-dim);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .no-results a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  /* Source badge */
+  .source-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 12px;
+    color: var(--text-dim);
+    margin-top: 12px;
+  }
+
+  .source-badge a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  /* Footer */
+  .footer {
+    text-align: center;
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    color: var(--text-dim);
+    font-size: 13px;
+  }
+
+  .footer a {
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  /* Mobile */
+  @media (max-width: 600px) {
+    .container { padding: 32px 16px; }
+    .header h1 { font-size: 24px; }
+    .input-row { flex-direction: column; }
+    .btn { width: 100%; }
+    .logo { font-size: 36px; }
+    .video-thumb { height: 160px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="logo">🎧</div>
+    <h1><span>Set Tracker</span></h1>
+    <p>Paste a YouTube DJ set link. Get the tracklist.</p>
+  </div>
+
+  <div class="search-box">
+    <div class="input-row">
+      <input type="text" id="urlInput" placeholder="https://www.youtube.com/watch?v=..." autofocus>
+      <button class="btn" id="searchBtn" onclick="findTracklist()">Find Tracks</button>
+    </div>
+    <p class="hint">Works with YouTube links of DJ sets, live performances, and radio shows</p>
+  </div>
+
+  <div class="status" id="status">
+    <div class="spinner"></div>
+    <span class="status-text" id="statusText">Searching for tracklist...</span>
+  </div>
+
+  <div class="error" id="error"></div>
+
+  <div class="video-info" id="videoInfo">
+    <img class="video-thumb" id="videoThumb" src="" alt="">
+    <div class="video-meta">
+      <h3 id="videoTitle"></h3>
+      <span class="channel" id="videoChannel"></span>
+    </div>
+  </div>
+
+  <div class="tracklist" id="tracklist">
+    <div class="tracklist-header">
+      <h2>Tracklist</h2>
+      <span class="track-count" id="trackCount"></span>
+    </div>
+    <ul class="track-list" id="trackList"></ul>
+    <button class="copy-btn" onclick="copyTracklist()">📋 Copy tracklist</button>
+    <div style="padding: 0 24px 16px;">
+      <div class="source-badge" id="sourceBadge"></div>
+    </div>
+  </div>
+
+  <div class="no-results" id="noResults">
+    <div class="icon">🔍</div>
+    <h3>No tracklist found automatically</h3>
+    <p>Try these direct links:</p>
+    <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 16px; align-items: center;">
+      <a id="link1001" href="#" target="_blank" class="btn" style="text-decoration:none; font-size:13px; padding:10px 20px; width: 280px; text-align:center;">🔎 Search on 1001Tracklists</a>
+      <a id="linkGoogle" href="#" target="_blank" class="btn" style="text-decoration:none; font-size:13px; padding:10px 20px; background:var(--surface-2); border:1px solid var(--border); width: 280px; text-align:center;">🔎 Search on Google</a>
+      <a id="linkYT" href="#" target="_blank" class="btn" style="text-decoration:none; font-size:13px; padding:10px 20px; background:var(--surface-2); border:1px solid var(--border); width: 280px; text-align:center;">💬 Check YouTube comments</a>
+    </div>
+  </div>
+
+  <div class="footer">
+    Built by Alfonso — <a href="https://github.com/alfiedigs" target="_blank">vibe coded</a> with taste 🎵
+  </div>
+</div>
+
+<script>
+  // State
+  let currentTracks = [];
+  let currentVideoTitle = '';
+  let currentVideoId = '';
+
+  function extractVideoId(url) {
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+      /^([a-zA-Z0-9_-]{11})$/
+    ];
+    for (const p of patterns) {
+      const m = url.match(p);
+      if (m) return m[1];
+    }
+    return null;
+  }
+
+  function showStatus(msg) {
+    const el = document.getElementById('status');
+    document.getElementById('statusText').textContent = msg;
+    el.classList.add('visible');
+  }
+
+  function hideStatus() {
+    document.getElementById('status').classList.remove('visible');
+  }
+
+  function showError(msg) {
+    const el = document.getElementById('error');
+    el.textContent = msg;
+    el.classList.add('visible');
+  }
+
+  function hideError() {
+    document.getElementById('error').classList.remove('visible');
+  }
+
+  function hideAll() {
+    hideStatus();
+    hideError();
+    document.getElementById('videoInfo').classList.remove('visible');
+    document.getElementById('tracklist').classList.remove('visible');
+    document.getElementById('noResults').classList.remove('visible');
+  }
+
+  function showNoResults() {
+    // Set up direct search links using the video title
+    const q = encodeURIComponent(currentVideoTitle + ' tracklist');
+    document.getElementById('link1001').href = `https://www.1001tracklists.com/search/result.php?search_selection=2&main_search=${encodeURIComponent(currentVideoTitle)}`;
+    document.getElementById('linkGoogle').href = `https://www.google.com/search?q=${q}+site:1001tracklists.com`;
+    document.getElementById('linkYT').href = `https://www.youtube.com/watch?v=${currentVideoId}`;
+    document.getElementById('noResults').classList.add('visible');
+  }
+
+  async function findTracklist() {
+    const url = document.getElementById('urlInput').value.trim();
+    if (!url) return;
+
+    const videoId = extractVideoId(url);
+    if (!videoId) {
+      showError('Invalid YouTube URL. Paste a link like https://www.youtube.com/watch?v=...');
+      return;
+    }
+
+    currentVideoId = videoId;
+    hideAll();
+    showStatus('Fetching video info...');
+    document.getElementById('searchBtn').disabled = true;
+
+    try {
+      // Show video thumbnail and info via noembed
+      const thumbUrl = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+      const thumbFallback = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+      const img = document.getElementById('videoThumb');
+      img.src = thumbUrl;
+      img.onerror = () => { img.src = thumbFallback; };
+
+      try {
+        const oembed = await fetch(`https://noembed.com/embed?url=https://www.youtube.com/watch?v=${videoId}`);
+        const odata = await oembed.json();
+        currentVideoTitle = odata.title || 'DJ Set';
+        document.getElementById('videoTitle').textContent = currentVideoTitle;
+        document.getElementById('videoChannel').textContent = odata.author_name || '';
+      } catch {
+        currentVideoTitle = 'DJ Set';
+        document.getElementById('videoTitle').textContent = 'DJ Set';
+        document.getElementById('videoChannel').textContent = '';
+      }
+
+      document.getElementById('videoInfo').classList.add('visible');
+
+      // Step 1: Try YouTube description (most reliable for tracklists)
+      showStatus('Checking YouTube description...');
+      let tracks = await searchYouTubeData(videoId);
+
+      // Step 2: Try 1001Tracklists via DuckDuckGo
+      if (!tracks || tracks.length === 0) {
+        showStatus('Searching 1001Tracklists...');
+        tracks = await search1001Tracklists(videoId);
+      }
+
+      // Step 3: Try Google-style search with video title
+      if (!tracks || tracks.length === 0) {
+        showStatus('Searching by title...');
+        tracks = await searchByTitle(currentVideoTitle);
+      }
+
+      hideStatus();
+
+      if (tracks && tracks.length > 0) {
+        displayTracklist(tracks);
+      } else {
+        showNoResults();
+      }
+
+    } catch (err) {
+      hideStatus();
+      showError('Something went wrong: ' + err.message);
+    }
+
+    document.getElementById('searchBtn').disabled = false;
+  }
+
+  async function search1001Tracklists(videoId) {
+    // Use a CORS proxy to search 1001tracklists
+    // In production you'd use your own backend — for now we simulate with known data patterns
+    try {
+      const searchUrl = `https://www.1001tracklists.com/search/result.php?search_selection=1&main_search=${videoId}`;
+      // 1001Tracklists doesn't have a public API, so we try a DuckDuckGo search
+      const ddgUrl = `https://api.duckduckgo.com/?q=site:1001tracklists.com+${videoId}&format=json&no_html=1`;
+      const resp = await fetch(ddgUrl);
+      const data = await resp.json();
+
+      if (data.Results && data.Results.length > 0) {
+        // Found a 1001Tracklists link
+        const tracklistUrl = data.Results[0].FirstURL;
+        return [{
+          artist: '1001Tracklists result found',
+          title: 'Open link to view full tracklist',
+          time: '',
+          source: tracklistUrl
+        }];
+      }
+
+      // Try related topics
+      if (data.RelatedTopics && data.RelatedTopics.length > 0) {
+        for (const topic of data.RelatedTopics) {
+          if (topic.FirstURL && topic.FirstURL.includes('1001tracklists.com')) {
+            return [{
+              artist: '1001Tracklists result found',
+              title: topic.Text || 'Open link to view full tracklist',
+              time: '',
+              source: topic.FirstURL
+            }];
+          }
+        }
+      }
+    } catch (e) {
+      console.log('1001TL search failed:', e);
+    }
+    return [];
+  }
+
+  async function searchYouTubeData(videoId) {
+    // Try multiple Invidious instances
+    const invidious_instances = [
+      'https://inv.nadeko.net',
+      'https://invidious.protokolla.fi',
+      'https://invidious.privacyredirect.com',
+      'https://iv.datura.network',
+      'https://invidious.fdn.fr',
+      'https://vid.puffyan.us',
+      'https://invidious.nerdvpn.de',
+      'https://invidious.perennialte.ch'
+    ];
+
+    for (const instance of invidious_instances) {
+      try {
+        const resp = await fetch(`${instance}/api/v1/videos/${videoId}?fields=description,title,author`, {
+          signal: AbortSignal.timeout(4000)
+        });
+        if (!resp.ok) continue;
+        const data = await resp.json();
+
+        if (data.description) {
+          const tracks = parseTracklist(data.description);
+          if (tracks.length > 0) {
+            tracks._source = `YouTube description (via ${new URL(instance).hostname})`;
+            return tracks;
+          }
+        }
+      } catch (e) {
+        continue;
+      }
+    }
+
+    // Try Piped API instances
+    const piped_instances = [
+      'https://pipedapi.kavin.rocks',
+      'https://pipedapi.adminforge.de',
+      'https://api.piped.projectsegfau.lt'
+    ];
+
+    for (const instance of piped_instances) {
+      try {
+        const resp = await fetch(`${instance}/streams/${videoId}`, {
+          signal: AbortSignal.timeout(4000)
+        });
+        if (!resp.ok) continue;
+        const data = await resp.json();
+
+        if (data.description) {
+          const tracks = parseTracklist(data.description);
+          if (tracks.length > 0) {
+            tracks._source = 'YouTube description';
+            return tracks;
+          }
+        }
+      } catch (e) {
+        continue;
+      }
+    }
+
+    return [];
+  }
+
+  async function searchByTitle(title) {
+    // Search DuckDuckGo for the video title + tracklist on 1001tracklists
+    try {
+      const q = encodeURIComponent(title + ' tracklist site:1001tracklists.com');
+      const resp = await fetch(`https://api.duckduckgo.com/?q=${q}&format=json&no_html=1`, {
+        signal: AbortSignal.timeout(5000)
+      });
+      const data = await resp.json();
+
+      // Check AbstractURL
+      if (data.AbstractURL && data.AbstractURL.includes('1001tracklists.com')) {
+        return [{
+          artist: '1001Tracklists match found',
+          title: data.AbstractText || 'Open link to view full tracklist',
+          time: '',
+          source: data.AbstractURL
+        }];
+      }
+
+      // Check Results
+      if (data.Results) {
+        for (const r of data.Results) {
+          if (r.FirstURL && r.FirstURL.includes('1001tracklists.com')) {
+            return [{
+              artist: '1001Tracklists match found',
+              title: r.Text || 'Open link to view full tracklist',
+              time: '',
+              source: r.FirstURL
+            }];
+          }
+        }
+      }
+
+      // Check RelatedTopics
+      if (data.RelatedTopics) {
+        for (const topic of data.RelatedTopics) {
+          if (topic.FirstURL && topic.FirstURL.includes('1001tracklists.com')) {
+            return [{
+              artist: '1001Tracklists match found',
+              title: topic.Text || 'Open link to view full tracklist',
+              time: '',
+              source: topic.FirstURL
+            }];
+          }
+        }
+      }
+    } catch (e) {
+      console.log('Title search failed:', e);
+    }
+    return [];
+  }
+
+  function parseTracklist(text) {
+    const lines = text.split('\n');
+    const tracks = [];
+    const trackPatterns = [
+      // "01. Artist - Title" or "1. Artist - Title"
+      /^\s*(\d{1,3})[.\)]\s*(.+?)\s*[-–—]\s*(.+?)$/,
+      // "00:00 Artist - Title" or "0:00:00 Artist - Title"
+      /^\s*(\d{1,2}:?\d{2}:?\d{2})\s+(.+?)\s*[-–—]\s*(.+?)$/,
+      // "[00:00] Artist - Title"
+      /^\s*\[(\d{1,2}:?\d{2}:?\d{2})\]\s*(.+?)\s*[-–—]\s*(.+?)$/,
+      // "00:00 - Artist - Title"
+      /^\s*(\d{1,2}:?\d{2}:?\d{2})\s*[-–—]\s*(.+?)\s*[-–—]\s*(.+?)$/,
+      // "Artist - Title (timestamp)"
+      /^\s*(.+?)\s*[-–—]\s*(.+?)\s*\((\d{1,2}:?\d{2}:?\d{2})\)\s*$/,
+      // "Artist - Title [timestamp]"
+      /^\s*(.+?)\s*[-–—]\s*(.+?)\s*\[(\d{1,2}:?\d{2}:?\d{2})\]\s*$/,
+    ];
+
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.length < 5) continue;
+
+      for (let i = 0; i < trackPatterns.length; i++) {
+        const match = trimmed.match(trackPatterns[i]);
+        if (match) {
+          if (i === 0) {
+            // Numbered format: num, artist, title
+            tracks.push({ artist: match[2].trim(), title: match[3].trim(), time: '' });
+          } else if (i >= 1 && i <= 3) {
+            // Timestamp formats: time, artist, title
+            tracks.push({ artist: match[2].trim(), title: match[3].trim(), time: match[1] });
+          } else {
+            // Artist - Title (timestamp) or [timestamp]
+            tracks.push({ artist: match[1].trim(), title: match[2].trim(), time: match[3] });
+          }
+          break;
+        }
+      }
+    }
+
+    // Return if we found at least 2 tracks (some short sets only have a few)
+    if (tracks.length >= 2) return tracks;
+    return [];
+  }
+
+  function displayTracklist(tracks) {
+    const listEl = document.getElementById('trackList');
+    const countEl = document.getElementById('trackCount');
+    const badgeEl = document.getElementById('sourceBadge');
+
+    currentTracks = tracks;
+
+    // Check if it's a link result (from 1001Tracklists search)
+    if (tracks.length === 1 && tracks[0].source) {
+      listEl.innerHTML = `
+        <li class="track-item">
+          <span class="track-num">🔗</span>
+          <div class="track-info">
+            <div class="track-artist">${tracks[0].artist}</div>
+            <div class="track-title">
+              <a href="${tracks[0].source}" target="_blank" style="color: var(--accent); text-decoration: none;">
+                ${tracks[0].source}
+              </a>
+            </div>
+          </div>
+        </li>
+      `;
+      countEl.textContent = 'Link found';
+      badgeEl.innerHTML = `Source: <a href="${tracks[0].source}" target="_blank">1001Tracklists</a>`;
+    } else {
+      listEl.innerHTML = tracks.map((t, i) => `
+        <li class="track-item">
+          <span class="track-num">${String(i + 1).padStart(2, '0')}</span>
+          <div class="track-info">
+            <div class="track-artist">${escapeHtml(t.artist)}</div>
+            <div class="track-title">${escapeHtml(t.title)}</div>
+          </div>
+          ${t.time ? `<span class="track-time">${t.time}</span>` : ''}
+        </li>
+      `).join('');
+      countEl.textContent = `${tracks.length} tracks`;
+      const source = tracks._source || 'YouTube description';
+      badgeEl.innerHTML = `Source: ${source}`;
+    }
+
+    document.getElementById('tracklist').classList.add('visible');
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  function copyTracklist() {
+    if (!currentTracks.length) return;
+
+    const text = currentTracks
+      .filter(t => !t.source)
+      .map((t, i) => `${i + 1}. ${t.artist} - ${t.title}${t.time ? ' [' + t.time + ']' : ''}`)
+      .join('\n');
+
+    const title = document.getElementById('videoTitle').textContent;
+    const full = `${title}\n${'─'.repeat(40)}\n${text}`;
+
+    navigator.clipboard.writeText(full).then(() => {
+      const btn = document.querySelector('.copy-btn');
+      btn.textContent = '✅ Copied!';
+      setTimeout(() => { btn.textContent = '📋 Copy tracklist'; }, 2000);
+    });
+  }
+
+  // Enter key triggers search
+  document.getElementById('urlInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') findTracklist();
+  });
+</script>
+
+</body>
+</html>
