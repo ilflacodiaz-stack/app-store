@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0a0a">
+<title>Ricettario — My Recipes</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0a;
+    --surface: #141414;
+    --surface-2: #1c1c1c;
+    --surface-3: #242424;
+    --border: #2a2a2a;
+    --border-hover: #3a3a3a;
+    --text: #f0f0f0;
+    --text-dim: #888;
+    --text-muted: #555;
+    --accent: #f97316;
+    --accent-soft: rgba(249, 115, 22, 0.12);
+    --accent-hover: #fb923c;
+    --green: #22c55e;
+    --green-soft: rgba(34, 197, 94, 0.12);
+    --red: #ef4444;
+    --red-soft: rgba(239, 68, 68, 0.12);
+    --blue: #3b82f6;
+    --blue-soft: rgba(59, 130, 246, 0.12);
+    --purple: #8b5cf6;
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(249, 115, 22, 0.05) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(239, 68, 68, 0.03) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 48px 20px 100px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .header {
+    margin-bottom: 32px;
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+  }
+
+  .back-link {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.2s;
+  }
+
+  .back-link:hover { color: var(--text); }
+
+  .header h1 {
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: -1px;
+    line-height: 1.1;
+  }
+
+  .header h1 .highlight {
+    background: linear-gradient(135deg, var(--accent), #ef4444);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .header .subtitle {
+    color: var(--text-dim);
+    font-size: 14px;
+    margin-top: 8px;
+  }
+
+  /* Search & Actions */
+  .toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+
+  .search-box {
+    flex: 1;
+    position: relative;
+  }
+
+  .search-box input {
+    width: 100%;
+    padding: 12px 16px 12px 40px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-box input:focus { border-color: var(--accent); }
+
+  .search-box input::placeholder { color: var(--text-muted); }
+
+  .search-box::before {
+    content: '🔍';
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+  }
+
+  .btn {
+    padding: 12px 20px;
+    border-radius: var(--radius-sm);
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: white;
+  }
+
+  .btn-primary:hover { background: var(--accent-hover); }
+
+  .btn-secondary {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  .btn-secondary:hover { border-color: var(--border-hover); background: var(--surface-2); }
+
+  .btn-danger {
+    background: var(--red-soft);
+    color: var(--red);
+  }
+
+  .btn-danger:hover { background: rgba(239, 68, 68, 0.2); }
+
+  .btn-small {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+
+  /* Tags filter */
+  .tags-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .tag-filter {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+
+  .tag-filter:hover { border-color: var(--accent); color: var(--text); }
+
+  .tag-filter.active {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* Recipe cards */
+  .recipes-grid {
+    display: grid;
+    gap: 16px;
+  }
+
+  .recipe-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+  }
+
+  .recipe-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px rgba(249, 115, 22, 0.08);
+  }
+
+  .recipe-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 10px;
+  }
+
+  .recipe-emoji {
+    font-size: 32px;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface-3);
+    border-radius: 12px;
+  }
+
+  .recipe-info { flex: 1; min-width: 0; }
+
+  .recipe-name {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+
+  .recipe-origin {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  .recipe-desc {
+    font-size: 13px;
+    color: var(--text-dim);
+    line-height: 1.5;
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .recipe-footer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .recipe-tag {
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-weight: 500;
+    background: var(--surface-3);
+    color: var(--text-dim);
+  }
+
+  .recipe-tag.has-video {
+    background: var(--red-soft);
+    color: var(--red);
+  }
+
+  .recipe-time {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-left: auto;
+  }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+  }
+
+  .empty-state .emoji { font-size: 48px; margin-bottom: 16px; }
+  .empty-state h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+  .empty-state p { color: var(--text-dim); font-size: 14px; margin-bottom: 24px; }
+
+  /* Modal */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 16px;
+    overflow-y: auto;
+  }
+
+  .modal-overlay.active { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    width: 100%;
+    max-width: 600px;
+    padding: 28px;
+    position: relative;
+    animation: modalIn 0.2s ease-out;
+  }
+
+  @keyframes modalIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: var(--surface-3);
+    border: none;
+    color: var(--text-dim);
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .modal-close:hover { background: var(--border); color: var(--text); }
+
+  .modal h2 {
+    font-size: 22px;
+    font-weight: 800;
+    margin-bottom: 20px;
+  }
+
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    width: 100%;
+    padding: 10px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+    resize: vertical;
+  }
+
+  .form-group input:focus,
+  .form-group textarea:focus,
+  .form-group select:focus { border-color: var(--accent); }
+
+  .form-group textarea { min-height: 100px; }
+
+  .form-group .hint {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 24px;
+  }
+
+  /* Recipe detail view */
+  .detail-view { display: none; }
+  .detail-view.active { display: block; }
+  .list-view.hidden { display: none; }
+
+  .detail-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 24px;
+    cursor: pointer;
+    color: var(--text-dim);
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.2s;
+  }
+
+  .detail-header:hover { color: var(--text); }
+
+  .detail-title {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .detail-title .recipe-emoji {
+    font-size: 40px;
+    width: 60px;
+    height: 60px;
+  }
+
+  .detail-title h2 {
+    font-size: 28px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+  }
+
+  .detail-title .origin {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-top: 2px;
+  }
+
+  .detail-meta {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .detail-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--text-dim);
+    padding: 6px 12px;
+    background: var(--surface);
+    border-radius: 8px;
+  }
+
+  .detail-section {
+    margin-bottom: 28px;
+  }
+
+  .detail-section h3 {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-size: 12px;
+  }
+
+  .detail-section p,
+  .detail-section .content {
+    font-size: 15px;
+    line-height: 1.8;
+    color: var(--text-dim);
+    white-space: pre-wrap;
+  }
+
+  .video-embed {
+    width: 100%;
+    aspect-ratio: 16/9;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    margin-top: 8px;
+    background: #000;
+  }
+
+  .video-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px;
+    background: var(--red-soft);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.2s;
+    margin-top: 8px;
+  }
+
+  .video-link:hover { background: rgba(239, 68, 68, 0.2); }
+
+  .video-link .yt-icon { font-size: 24px; }
+  .video-link .yt-text { font-size: 13px; font-weight: 500; }
+
+  .detail-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  .share-toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--green);
+    color: white;
+    padding: 12px 24px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 200;
+    transition: transform 0.3s ease;
+    pointer-events: none;
+  }
+
+  .share-toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* Stats */
+  .stats {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stat-num {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--accent);
+  }
+
+  .stat-label {
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  /* Mobile */
+  @media (max-width: 600px) {
+    .container { padding: 32px 16px 80px; }
+    .header h1 { font-size: 26px; }
+    .form-row { grid-template-columns: 1fr; }
+    .toolbar { flex-direction: column; }
+    .detail-title h2 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- LIST VIEW -->
+  <div class="list-view" id="listView">
+    <div class="header">
+      <div class="header-top">
+        <a href="/" class="back-link">← App Store</a>
+      </div>
+      <h1><span class="highlight">Ricettario</span></h1>
+      <p class="subtitle">Your personal recipe collection. Save, cook, share.</p>
+    </div>
+
+    <div class="stats" id="stats"></div>
+
+    <div class="toolbar">
+      <div class="search-box">
+        <input type="text" id="searchInput" placeholder="Search recipes...">
+      </div>
+      <button class="btn btn-primary" onclick="openAddModal()">+ Add Recipe</button>
+    </div>
+
+    <div class="tags-bar" id="tagsBar"></div>
+    <div class="recipes-grid" id="recipesGrid"></div>
+  </div>
+
+  <!-- DETAIL VIEW -->
+  <div class="detail-view" id="detailView">
+    <div class="detail-header" onclick="showList()">← Back to recipes</div>
+    <div id="detailContent"></div>
+  </div>
+</div>
+
+<!-- ADD/EDIT MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <button class="modal-close" onclick="closeModal()">×</button>
+    <h2 id="modalTitle">Add Recipe</h2>
+
+    <div class="form-group">
+      <label>Recipe Name</label>
+      <input type="text" id="recipeName" placeholder="e.g. Melanzane alla Parmigiana">
+    </div>
+
+    <div class="form-group">
+      <label>Emoji</label>
+      <input type="text" id="recipeEmoji" placeholder="e.g. 🍆" maxlength="4" style="width: 80px;">
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Cuisine / Origin</label>
+        <input type="text" id="recipeOrigin" placeholder="e.g. Italian">
+      </div>
+      <div class="form-group">
+        <label>Category</label>
+        <select id="recipeCategory">
+          <option value="Main">Main</option>
+          <option value="Pasta">Pasta</option>
+          <option value="Appetizer">Appetizer</option>
+          <option value="Salad">Salad</option>
+          <option value="Soup">Soup</option>
+          <option value="Dessert">Dessert</option>
+          <option value="Breakfast">Breakfast</option>
+          <option value="Snack">Snack</option>
+          <option value="Drink">Drink</option>
+          <option value="Sauce">Sauce</option>
+          <option value="Side">Side</option>
+          <option value="Other">Other</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label>Prep Time</label>
+        <input type="text" id="recipeTime" placeholder="e.g. 45 min">
+      </div>
+      <div class="form-group">
+        <label>Servings</label>
+        <input type="text" id="recipeServings" placeholder="e.g. 4">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label>Ingredients</label>
+      <textarea id="recipeIngredients" placeholder="One ingredient per line..."></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>Instructions</label>
+      <textarea id="recipeInstructions" placeholder="Paste the recipe steps here..." style="min-height: 140px;"></textarea>
+    </div>
+
+    <div class="form-group">
+      <label>YouTube Video URL (optional)</label>
+      <input type="text" id="recipeVideo" placeholder="https://youtube.com/watch?v=...">
+      <p class="hint">Add a video from your favorite chef — Gennaro, Kenji, whoever</p>
+    </div>
+
+    <div class="form-group">
+      <label>Personal Notes (optional)</label>
+      <textarea id="recipeNotes" placeholder="Your tips, modifications, opinions..." style="min-height: 60px;"></textarea>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="saveBtn" onclick="saveRecipe()">Save Recipe</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="share-toast" id="toast"></div>
+
+<script>
+  // Data
+  let recipes = JSON.parse(localStorage.getItem('ricettario_recipes') || '[]');
+  let editingId = null;
+  let activeTag = null;
+
+  // Sample recipes to start with
+  if (recipes.length === 0) {
+    recipes = [
+      {
+        id: Date.now(),
+        name: "Melanzane alla Parmigiana",
+        emoji: "🍆",
+        origin: "Italian",
+        category: "Main",
+        time: "1h 30min",
+        servings: "6",
+        ingredients: "3 large eggplants\n500ml tomato sauce (passata)\n250g mozzarella\n100g parmigiano reggiano\nFresh basil\nOlive oil\nSalt\n2 eggs (optional, for coating)\nFlour (optional, for coating)",
+        instructions: "1. Slice eggplants lengthwise, about 5mm thick\n2. Salt the slices and let them rest 30 min to release moisture\n3. Pat dry and either fry in olive oil or grill until golden\n4. In a baking dish, layer: tomato sauce, eggplant, mozzarella, parmigiano, basil\n5. Repeat layers until everything is used\n6. Top with tomato sauce, mozzarella, and parmigiano\n7. Bake at 180°C for 35-40 minutes until golden and bubbly\n8. Let it rest 15 minutes before serving — this is key!",
+        video: "https://www.youtube.com/watch?v=CHaHgFuMgnE",
+        notes: "Gennaro's version is the best. Don't skip the resting time — it holds together much better. I prefer frying the eggplant over grilling, more flavor.",
+        createdAt: new Date().toISOString()
+      }
+    ];
+    save();
+  }
+
+  function save() {
+    localStorage.setItem('ricettario_recipes', JSON.stringify(recipes));
+  }
+
+  function getYouTubeId(url) {
+    if (!url) return null;
+    const match = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([^&?\s]+)/);
+    return match ? match[1] : null;
+  }
+
+  function getAllTags() {
+    const tags = new Set();
+    recipes.forEach(r => {
+      if (r.category) tags.add(r.category);
+      if (r.origin) tags.add(r.origin);
+    });
+    return [...tags].sort();
+  }
+
+  function renderStats() {
+    const el = document.getElementById('stats');
+    const withVideo = recipes.filter(r => r.video).length;
+    const cuisines = new Set(recipes.map(r => r.origin).filter(Boolean));
+    el.innerHTML = `
+      <div><span class="stat-num">${recipes.length}</span> <span class="stat-label">${recipes.length === 1 ? 'recipe' : 'recipes'}</span></div>
+      <div><span class="stat-num">${cuisines.size}</span> <span class="stat-label">${cuisines.size === 1 ? 'cuisine' : 'cuisines'}</span></div>
+      <div><span class="stat-num">${withVideo}</span> <span class="stat-label">with video</span></div>
+    `;
+  }
+
+  function renderTags() {
+    const tags = getAllTags();
+    const el = document.getElementById('tagsBar');
+    el.innerHTML = tags.map(tag => `
+      <button class="tag-filter ${activeTag === tag ? 'active' : ''}" onclick="toggleTag('${tag}')">${tag}</button>
+    `).join('');
+  }
+
+  function toggleTag(tag) {
+    activeTag = activeTag === tag ? null : tag;
+    renderTags();
+    renderRecipes();
+  }
+
+  function renderRecipes() {
+    const query = document.getElementById('searchInput').value.toLowerCase();
+    const grid = document.getElementById('recipesGrid');
+
+    let filtered = recipes.filter(r => {
+      const matchesSearch = !query ||
+        r.name.toLowerCase().includes(query) ||
+        (r.origin || '').toLowerCase().includes(query) ||
+        (r.category || '').toLowerCase().includes(query) ||
+        (r.ingredients || '').toLowerCase().includes(query) ||
+        (r.notes || '').toLowerCase().includes(query);
+
+      const matchesTag = !activeTag ||
+        r.category === activeTag ||
+        r.origin === activeTag;
+
+      return matchesSearch && matchesTag;
+    });
+
+    if (filtered.length === 0 && recipes.length === 0) {
+      grid.innerHTML = `
+        <div class="empty-state">
+          <div class="emoji">👨‍🍳</div>
+          <h3>No recipes yet</h3>
+          <p>Add your first recipe — paste it from ChatGPT, save a Gennaro classic, or write your own.</p>
+          <button class="btn btn-primary" onclick="openAddModal()">+ Add Your First Recipe</button>
+        </div>
+      `;
+      return;
+    }
+
+    if (filtered.length === 0) {
+      grid.innerHTML = `
+        <div class="empty-state">
+          <div class="emoji">🤷</div>
+          <h3>No recipes found</h3>
+          <p>Try a different search or tag.</p>
+        </div>
+      `;
+      return;
+    }
+
+    grid.innerHTML = filtered.map(r => `
+      <div class="recipe-card" onclick="showDetail('${r.id}')">
+        <div class="recipe-card-header">
+          <div class="recipe-emoji">${r.emoji || '🍽️'}</div>
+          <div class="recipe-info">
+            <div class="recipe-name">${r.name}</div>
+            <div class="recipe-origin">${[r.origin, r.time].filter(Boolean).join(' · ')}</div>
+          </div>
+        </div>
+        ${r.notes ? `<div class="recipe-desc">${r.notes}</div>` : ''}
+        <div class="recipe-footer">
+          ${r.category ? `<span class="recipe-tag">${r.category}</span>` : ''}
+          ${r.video ? `<span class="recipe-tag has-video">📹 Video</span>` : ''}
+          ${r.servings ? `<span class="recipe-time">🍽️ ${r.servings} servings</span>` : ''}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function showDetail(id) {
+    const r = recipes.find(r => String(r.id) === String(id));
+    if (!r) return;
+
+    document.getElementById('listView').classList.add('hidden');
+    const detail = document.getElementById('detailView');
+    detail.classList.add('active');
+
+    const ytId = getYouTubeId(r.video);
+
+    document.getElementById('detailContent').innerHTML = `
+      <div class="detail-title">
+        <div class="recipe-emoji">${r.emoji || '🍽️'}</div>
+        <div>
+          <h2>${r.name}</h2>
+          ${r.origin ? `<div class="origin">${r.origin}</div>` : ''}
+        </div>
+      </div>
+
+      <div class="detail-meta">
+        ${r.time ? `<div class="detail-meta-item">⏱️ ${r.time}</div>` : ''}
+        ${r.servings ? `<div class="detail-meta-item">🍽️ ${r.servings} servings</div>` : ''}
+        ${r.category ? `<div class="detail-meta-item">📁 ${r.category}</div>` : ''}
+      </div>
+
+      ${r.ingredients ? `
+        <div class="detail-section">
+          <h3>Ingredients</h3>
+          <div class="content">${r.ingredients}</div>
+        </div>
+      ` : ''}
+
+      ${r.instructions ? `
+        <div class="detail-section">
+          <h3>Instructions</h3>
+          <div class="content">${r.instructions}</div>
+        </div>
+      ` : ''}
+
+      ${r.notes ? `
+        <div class="detail-section">
+          <h3>My Notes</h3>
+          <div class="content">${r.notes}</div>
+        </div>
+      ` : ''}
+
+      ${ytId ? `
+        <div class="detail-section">
+          <h3>Video</h3>
+          <iframe class="video-embed" src="https://www.youtube.com/embed/${ytId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+      ` : r.video ? `
+        <div class="detail-section">
+          <h3>Video</h3>
+          <a href="${r.video}" target="_blank" class="video-link">
+            <span class="yt-icon">▶️</span>
+            <span class="yt-text">Watch on YouTube</span>
+          </a>
+        </div>
+      ` : ''}
+
+      <div class="detail-actions">
+        <button class="btn btn-secondary" onclick="shareRecipe('${r.id}')">📤 Share</button>
+        <button class="btn btn-secondary" onclick="editRecipe('${r.id}')">✏️ Edit</button>
+        <button class="btn btn-danger" onclick="deleteRecipe('${r.id}')">🗑️ Delete</button>
+      </div>
+    `;
+
+    window.scrollTo(0, 0);
+  }
+
+  function showList() {
+    document.getElementById('listView').classList.remove('hidden');
+    document.getElementById('detailView').classList.remove('active');
+    renderAll();
+  }
+
+  function openAddModal() {
+    editingId = null;
+    document.getElementById('modalTitle').textContent = 'Add Recipe';
+    document.getElementById('recipeName').value = '';
+    document.getElementById('recipeEmoji').value = '';
+    document.getElementById('recipeOrigin').value = '';
+    document.getElementById('recipeCategory').value = 'Main';
+    document.getElementById('recipeTime').value = '';
+    document.getElementById('recipeServings').value = '';
+    document.getElementById('recipeIngredients').value = '';
+    document.getElementById('recipeInstructions').value = '';
+    document.getElementById('recipeVideo').value = '';
+    document.getElementById('recipeNotes').value = '';
+    document.getElementById('saveBtn').textContent = 'Save Recipe';
+    document.getElementById('modalOverlay').classList.add('active');
+  }
+
+  function editRecipe(id) {
+    const r = recipes.find(r => String(r.id) === String(id));
+    if (!r) return;
+
+    editingId = id;
+    document.getElementById('modalTitle').textContent = 'Edit Recipe';
+    document.getElementById('recipeName').value = r.name || '';
+    document.getElementById('recipeEmoji').value = r.emoji || '';
+    document.getElementById('recipeOrigin').value = r.origin || '';
+    document.getElementById('recipeCategory').value = r.category || 'Main';
+    document.getElementById('recipeTime').value = r.time || '';
+    document.getElementById('recipeServings').value = r.servings || '';
+    document.getElementById('recipeIngredients').value = r.ingredients || '';
+    document.getElementById('recipeInstructions').value = r.instructions || '';
+    document.getElementById('recipeVideo').value = r.video || '';
+    document.getElementById('recipeNotes').value = r.notes || '';
+    document.getElementById('saveBtn').textContent = 'Update Recipe';
+    document.getElementById('modalOverlay').classList.add('active');
+  }
+
+  function closeModal(e) {
+    if (e && e.target !== document.getElementById('modalOverlay')) return;
+    document.getElementById('modalOverlay').classList.remove('active');
+  }
+
+  function saveRecipe() {
+    const name = document.getElementById('recipeName').value.trim();
+    if (!name) { document.getElementById('recipeName').focus(); return; }
+
+    const data = {
+      name,
+      emoji: document.getElementById('recipeEmoji').value.trim() || '🍽️',
+      origin: document.getElementById('recipeOrigin').value.trim(),
+      category: document.getElementById('recipeCategory').value,
+      time: document.getElementById('recipeTime').value.trim(),
+      servings: document.getElementById('recipeServings').value.trim(),
+      ingredients: document.getElementById('recipeIngredients').value.trim(),
+      instructions: document.getElementById('recipeInstructions').value.trim(),
+      video: document.getElementById('recipeVideo').value.trim(),
+      notes: document.getElementById('recipeNotes').value.trim(),
+    };
+
+    if (editingId) {
+      const idx = recipes.findIndex(r => String(r.id) === String(editingId));
+      if (idx !== -1) {
+        recipes[idx] = { ...recipes[idx], ...data };
+      }
+    } else {
+      data.id = Date.now();
+      data.createdAt = new Date().toISOString();
+      recipes.unshift(data);
+    }
+
+    save();
+    closeModal();
+    showList();
+    showToast(editingId ? 'Recipe updated!' : 'Recipe saved!');
+    editingId = null;
+  }
+
+  function deleteRecipe(id) {
+    if (!confirm('Delete this recipe?')) return;
+    recipes = recipes.filter(r => String(r.id) !== String(id));
+    save();
+    showList();
+    showToast('Recipe deleted');
+  }
+
+  function shareRecipe(id) {
+    const r = recipes.find(r => String(r.id) === String(id));
+    if (!r) return;
+
+    let text = `🍽️ ${r.name}`;
+    if (r.origin) text += ` (${r.origin})`;
+    text += '\n\n';
+    if (r.ingredients) text += `📝 Ingredients:\n${r.ingredients}\n\n`;
+    if (r.instructions) text += `👨‍🍳 Instructions:\n${r.instructions}\n\n`;
+    if (r.notes) text += `💬 Notes: ${r.notes}\n\n`;
+    if (r.video) text += `📹 Video: ${r.video}\n`;
+    text += `\n— Shared from Ricettario`;
+
+    if (navigator.share) {
+      navigator.share({ title: r.name, text }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('Recipe copied to clipboard!');
+      });
+    }
+  }
+
+  function showToast(msg) {
+    const toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => toast.classList.remove('show'), 2500);
+  }
+
+  function renderAll() {
+    renderStats();
+    renderTags();
+    renderRecipes();
+  }
+
+  // Search
+  document.getElementById('searchInput').addEventListener('input', renderRecipes);
+
+  // Init
+  renderAll();
+</script>
+</body>
+</html>
