@@ -744,7 +744,7 @@
         servings: "4",
         ingredients: "1 onion\n2 carrots\n2 celery stalks\n1 zucchini\n2 potatoes\n1 can tomatoes\n1 can cannellini beans\n1 liter vegetable stock\nSmall pasta or rice\nOlive oil\nParmigiano\nFresh basil",
         instructions: "1. Dice the vegetables into small pieces\n2. Soften onion, carrot, and celery in olive oil\n3. Add zucchini, potatoes, tomatoes, beans, and stock\n4. Simmer until the vegetables are tender\n5. Add pasta or rice and cook until done\n6. Finish with olive oil, basil, and parmigiano",
-        video: "https://www.youtube.com/results?search_query=minestrone+soup+italian+recipe",
+        video: "https://www.youtube.com/watch?v=alU_S3c8XBo&t=8s",
         notes: "Simple, flexible, and perfect for using whatever vegetables are in the kitchen.",
         createdAt: new Date(now + 1).toISOString()
       },
@@ -767,7 +767,7 @@
 
   // Sample recipes to start with. These only appear automatically for a new
   // visitor, or upgrade an older demo that only had Melanzane saved locally.
-  const DEMO_SEED_VERSION = '6';
+  const DEMO_SEED_VERSION = '7';
   const defaultRecipes = getDefaultRecipes();
   const defaultRecipeNames = defaultRecipes.map(r => r.name);
   const oldDefaultRecipeNames = ["Spaghetti al Pomodoro"];
@@ -790,6 +790,10 @@
       recipes = recipes.map(r => r.name === "Melanzane alla Parmigiana" ? {
         ...r,
         video: "https://www.youtube.com/watch?v=rq1EUwiLa6M&t=131s"
+      } : r);
+      recipes = recipes.map(r => r.name === "Minestrone" ? {
+        ...r,
+        video: "https://www.youtube.com/watch?v=alU_S3c8XBo&t=8s"
       } : r);
       const existingNames = new Set(recipes.map(r => (r.name || '').toLowerCase()));
       const missingDefaults = defaultRecipes.filter(r => !existingNames.has(r.name.toLowerCase()));
