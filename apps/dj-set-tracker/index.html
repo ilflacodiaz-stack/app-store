@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Set Tracker — DJ Set Tracklist Finder</title>
+<title>Song Tracker — Song & Tracklist Finder</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
@@ -57,6 +57,21 @@
     text-align: center;
     margin-bottom: 48px;
   }
+
+  .back-link {
+    display: flex;
+    width: fit-content;
+    align-items: center;
+    gap: 4px;
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 24px;
+    transition: color 0.2s;
+  }
+
+  .back-link:hover { color: var(--text); }
 
   .logo {
     font-size: 48px;
@@ -418,6 +433,52 @@
     text-decoration: none;
   }
 
+  /* Fallback buttons (no-results) */
+  .fallback-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 20px;
+    align-items: stretch;
+    max-width: 320px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .fallback-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 18px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    color: var(--text);
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .fallback-btn:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-1px);
+  }
+
+  .fallback-btn.primary {
+    background: var(--accent);
+    color: white;
+    border-color: var(--accent);
+  }
+
+  .fallback-btn.primary:hover {
+    background: #7c3aed;
+    color: white;
+  }
+
   /* Footer */
   .footer {
     text-align: center;
@@ -448,22 +509,23 @@
 
 <div class="container">
   <div class="header">
+    <a href="/" class="back-link">← App Store</a>
     <div class="logo">🎧</div>
-    <h1><span>Set Tracker</span></h1>
-    <p>Paste a YouTube DJ set link. Get the tracklist.</p>
+    <h1><span>Song Tracker</span></h1>
+    <p>Paste a YouTube DJ set or live concert link. Get the songs.</p>
   </div>
 
   <div class="search-box">
     <div class="input-row">
       <input type="text" id="urlInput" placeholder="https://www.youtube.com/watch?v=..." autofocus>
-      <button class="btn" id="searchBtn" onclick="findTracklist()">Find Tracks</button>
+      <button class="btn" id="searchBtn" onclick="findTracklist()">Find Songs</button>
     </div>
-    <p class="hint">Works with YouTube links of DJ sets, live performances, and radio shows</p>
+    <p class="hint">Works with YouTube links from DJ sets, live concerts, live performances, and radio shows</p>
   </div>
 
   <div class="status" id="status">
     <div class="spinner"></div>
-    <span class="status-text" id="statusText">Searching for tracklist...</span>
+    <span class="status-text" id="statusText">Searching for songs...</span>
   </div>
 
   <div class="error" id="error"></div>
@@ -478,11 +540,11 @@
 
   <div class="tracklist" id="tracklist">
     <div class="tracklist-header">
-      <h2>Tracklist</h2>
+      <h2>Songs found</h2>
       <span class="track-count" id="trackCount"></span>
     </div>
     <ul class="track-list" id="trackList"></ul>
-    <button class="copy-btn" onclick="copyTracklist()">📋 Copy tracklist</button>
+    <button class="copy-btn" onclick="copyTracklist()">📋 Copy songs</button>
     <div style="padding: 0 24px 16px;">
       <div class="source-badge" id="sourceBadge"></div>
     </div>
@@ -490,25 +552,52 @@
 
   <div class="no-results" id="noResults">
     <div class="icon">🔍</div>
-    <h3>No tracklist found automatically</h3>
+    <h3>No songs found automatically</h3>
     <p>Try these direct links:</p>
-    <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 16px; align-items: center;">
-      <a id="link1001" href="#" target="_blank" class="btn" style="text-decoration:none; font-size:13px; padding:10px 20px; width: 280px; text-align:center;">🔎 Search on 1001Tracklists</a>
-      <a id="linkGoogle" href="#" target="_blank" class="btn" style="text-decoration:none; font-size:13px; padding:10px 20px; background:var(--surface-2); border:1px solid var(--border); width: 280px; text-align:center;">🔎 Search on Google</a>
-      <a id="linkYT" href="#" target="_blank" class="btn" style="text-decoration:none; font-size:13px; padding:10px 20px; background:var(--surface-2); border:1px solid var(--border); width: 280px; text-align:center;">💬 Check YouTube comments</a>
+    <div class="fallback-actions">
+      <a id="link1001" href="#" target="_blank" rel="noopener" class="fallback-btn primary">🔎 Search on 1001Tracklists</a>
+      <a id="linkGoogle" href="#" target="_blank" rel="noopener" class="fallback-btn">🌐 Search on Google</a>
+      <a id="linkYT" href="#" target="_blank" rel="noopener" class="fallback-btn">💬 Open the YouTube video</a>
     </div>
   </div>
 
   <div class="footer">
-    Built by Alfonso — <a href="https://github.com/alfiedigs" target="_blank">vibe coded</a> with taste 🎵
+    Built by Alfonso — <a href="https://github.com/ilflacodiaz-stack" target="_blank">vibe coded</a> with taste 🎵
   </div>
 </div>
 
 <script>
+  // ⚙️ Backend (mismo cerebro que el bot Jimmy). Después de deployar tracklist-api,
+  // pegá tu URL acá, ej: 'https://tracklist-api.vercel.app'. Vacío = usa solo el navegador.
+  const API_BASE = 'https://tracklist-api.vercel.app';
+
   // State
   let currentTracks = [];
   let currentVideoTitle = '';
   let currentVideoId = '';
+
+  async function fetchFromApi(videoId) {
+    try {
+      const resp = await fetch(`${API_BASE}/api/tracklist?v=${videoId}`, {
+        signal: AbortSignal.timeout(20000)
+      });
+      if (!resp.ok) return [];
+      const data = await resp.json();
+      if (data && data.found && Array.isArray(data.tracks) && data.tracks.length) {
+        const tracks = data.tracks.map(t => ({ artist: t.artist, title: t.title, time: t.time || '' }));
+        tracks._source = 'tracklist engine';
+        if (data.title) {
+          currentVideoTitle = data.title;
+          document.getElementById('videoTitle').textContent = data.title;
+        }
+        if (data.author) document.getElementById('videoChannel').textContent = data.author;
+        return tracks;
+      }
+    } catch (e) {
+      console.log('API fetch failed:', e);
+    }
+    return [];
+  }
 
   function extractVideoId(url) {
     const patterns = [
@@ -551,10 +640,15 @@
   }
 
   function showNoResults() {
-    // Set up direct search links using the video title
-    const q = encodeURIComponent(currentVideoTitle + ' tracklist');
-    document.getElementById('link1001').href = `https://www.1001tracklists.com/search/result.php?search_selection=2&main_search=${encodeURIComponent(currentVideoTitle)}`;
-    document.getElementById('linkGoogle').href = `https://www.google.com/search?q=${q}+site:1001tracklists.com`;
+    // Clean the title a bit (drop common noise words) for better search hits
+    const cleanTitle = (currentVideoTitle || 'live set')
+      .replace(/\b(official|full set|live|hd|4k|instore session|in[- ]?store)\b/gi, '')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+    const titleEnc = encodeURIComponent(cleanTitle);
+    // 1001Tracklists: a Google site-scoped search is the most reliable way to land on the right page
+    document.getElementById('link1001').href = `https://www.google.com/search?q=${titleEnc}+site:1001tracklists.com`;
+    document.getElementById('linkGoogle').href = `https://www.google.com/search?q=${encodeURIComponent(cleanTitle + ' tracklist setlist')}`;
     document.getElementById('linkYT').href = `https://www.youtube.com/watch?v=${currentVideoId}`;
     document.getElementById('noResults').classList.add('visible');
   }
@@ -585,20 +679,30 @@
       try {
         const oembed = await fetch(`https://noembed.com/embed?url=https://www.youtube.com/watch?v=${videoId}`);
         const odata = await oembed.json();
-        currentVideoTitle = odata.title || 'DJ Set';
+        currentVideoTitle = odata.title || 'Live Set';
         document.getElementById('videoTitle').textContent = currentVideoTitle;
         document.getElementById('videoChannel').textContent = odata.author_name || '';
       } catch {
-        currentVideoTitle = 'DJ Set';
-        document.getElementById('videoTitle').textContent = 'DJ Set';
+        currentVideoTitle = 'Live Set';
+        document.getElementById('videoTitle').textContent = 'Live Set';
         document.getElementById('videoChannel').textContent = '';
       }
 
       document.getElementById('videoInfo').classList.add('visible');
 
-      // Step 1: Try YouTube description (most reliable for tracklists)
-      showStatus('Checking YouTube description...');
-      let tracks = await searchYouTubeData(videoId);
+      // Step 0: Backend engine (same brain as the Jimmy bot) — fetches the
+      // description server-side, no CORS. Most reliable when configured.
+      let tracks = [];
+      if (API_BASE) {
+        showStatus('Asking the tracklist engine...');
+        tracks = await fetchFromApi(videoId);
+      }
+
+      // Step 1: Try the YouTube description directly from the browser
+      if (!tracks || tracks.length === 0) {
+        showStatus('Checking YouTube description...');
+        tracks = await searchYouTubeData(videoId);
+      }
 
       // Step 2: Try 1001Tracklists via DuckDuckGo
       if (!tracks || tracks.length === 0) {
@@ -668,7 +772,46 @@
     return [];
   }
 
+  async function fetchDescriptionViaProxy(videoId) {
+    // Fetch the YouTube watch page through a CORS proxy and pull the description
+    // out of the embedded player JSON. No API key, more reliable than public instances.
+    const watch = `https://www.youtube.com/watch?v=${videoId}`;
+    const proxies = [
+      u => `https://api.allorigins.win/raw?url=${encodeURIComponent(u)}`,
+      u => `https://corsproxy.io/?url=${encodeURIComponent(u)}`,
+      u => `https://thingproxy.freeboard.io/fetch/${u}`,
+    ];
+    for (const wrap of proxies) {
+      try {
+        const resp = await fetch(wrap(watch), { signal: AbortSignal.timeout(8000) });
+        if (!resp.ok) continue;
+        const html = await resp.text();
+        const m = html.match(/"shortDescription":"((?:\\.|[^"\\])*)"/);
+        if (m && m[1]) {
+          let desc;
+          try { desc = JSON.parse('"' + m[1] + '"'); } catch { desc = m[1].replace(/\\n/g, '\n'); }
+          if (desc) return desc;
+        }
+      } catch (e) {
+        continue;
+      }
+    }
+    return null;
+  }
+
   async function searchYouTubeData(videoId) {
+    // Source 0: watch page via CORS proxy (most reliable, no API key)
+    try {
+      const desc = await fetchDescriptionViaProxy(videoId);
+      if (desc) {
+        const tracks = parseTracklist(desc);
+        if (tracks.length > 0) {
+          tracks._source = 'YouTube description';
+          return tracks;
+        }
+      }
+    } catch (e) { /* fall through to other sources */ }
+
     // Try multiple Invidious instances
     const invidious_instances = [
       'https://inv.nadeko.net',
@@ -784,48 +927,44 @@
   }
 
   function parseTracklist(text) {
-    const lines = text.split('\n');
-    const tracks = [];
-    const trackPatterns = [
-      // "01. Artist - Title" or "1. Artist - Title"
-      /^\s*(\d{1,3})[.\)]\s*(.+?)\s*[-–—]\s*(.+?)$/,
-      // "00:00 Artist - Title" or "0:00:00 Artist - Title"
-      /^\s*(\d{1,2}:?\d{2}:?\d{2})\s+(.+?)\s*[-–—]\s*(.+?)$/,
-      // "[00:00] Artist - Title"
-      /^\s*\[(\d{1,2}:?\d{2}:?\d{2})\]\s*(.+?)\s*[-–—]\s*(.+?)$/,
-      // "00:00 - Artist - Title"
-      /^\s*(\d{1,2}:?\d{2}:?\d{2})\s*[-–—]\s*(.+?)\s*[-–—]\s*(.+?)$/,
-      // "Artist - Title (timestamp)"
-      /^\s*(.+?)\s*[-–—]\s*(.+?)\s*\((\d{1,2}:?\d{2}:?\d{2})\)\s*$/,
-      // "Artist - Title [timestamp]"
-      /^\s*(.+?)\s*[-–—]\s*(.+?)\s*\[(\d{1,2}:?\d{2}:?\d{2})\]\s*$/,
+    if (!text) return [];
+    // Timestamps: M:SS, MM:SS, H:MM:SS, HH:MM:SS
+    const TS = '\\d{1,2}:\\d{2}(?::\\d{2})?';
+    const patterns = [
+      // --- "Artist - Title" formats (multi-artist DJ sets) ---
+      [new RegExp(`^\\s*(\\d{1,3})[.)]\\s*(.+?)\\s*[-–—]\\s*(.+?)$`), 'num'],
+      [new RegExp(`^\\s*(${TS})\\s+(.+?)\\s*[-–—]\\s*(.+?)$`), 'time_first'],
+      [new RegExp(`^\\s*\\[(${TS})\\]\\s*(.+?)\\s*[-–—]\\s*(.+?)$`), 'time_first'],
+      [new RegExp(`^\\s*(${TS})\\s*[-–—]\\s*(.+?)\\s*[-–—]\\s*(.+?)$`), 'time_first'],
+      [new RegExp(`^\\s*(.+?)\\s*[-–—]\\s*(.+?)\\s*\\((${TS})\\)\\s*$`), 'time_last'],
+      [new RegExp(`^\\s*(.+?)\\s*[-–—]\\s*(.+?)\\s*\\[(${TS})\\]\\s*$`), 'time_last'],
+      // --- dash-less (single-artist concerts: "1. Song (0:00)", "0:00 Song", "1. Song") ---
+      [new RegExp(`^\\s*\\d{1,3}[.)]\\s*(.+?)\\s*[\\(\\[](${TS})[\\)\\]]\\s*$`), 'song_time'],
+      [new RegExp(`^\\s*(${TS})\\s+(.+?)$`), 'time_song'],
+      [new RegExp(`^\\s*\\d{1,3}[.)]\\s*(.+?)$`), 'song_only'],
     ];
 
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed || trimmed.length < 5) continue;
-
-      for (let i = 0; i < trackPatterns.length; i++) {
-        const match = trimmed.match(trackPatterns[i]);
-        if (match) {
-          if (i === 0) {
-            // Numbered format: num, artist, title
-            tracks.push({ artist: match[2].trim(), title: match[3].trim(), time: '' });
-          } else if (i >= 1 && i <= 3) {
-            // Timestamp formats: time, artist, title
-            tracks.push({ artist: match[2].trim(), title: match[3].trim(), time: match[1] });
-          } else {
-            // Artist - Title (timestamp) or [timestamp]
-            tracks.push({ artist: match[1].trim(), title: match[2].trim(), time: match[3] });
-          }
-          break;
-        }
+    const tracks = [];
+    for (const line of text.split('\n')) {
+      const t = line.trim();
+      if (t.length < 5) continue;
+      for (const [rx, kind] of patterns) {
+        const m = t.match(rx);
+        if (!m) continue;
+        let a, ti, tm;
+        if (kind === 'num') { a = m[2]; ti = m[3]; tm = ''; }
+        else if (kind === 'time_first') { a = m[2]; ti = m[3]; tm = m[1]; }
+        else if (kind === 'time_last') { a = m[1]; ti = m[2]; tm = m[3]; }
+        else if (kind === 'song_time') { a = m[1]; ti = ''; tm = m[2]; }
+        else if (kind === 'time_song') { a = m[2]; ti = ''; tm = m[1]; }
+        else { a = m[1]; ti = ''; tm = ''; }
+        tracks.push({ artist: a.trim(), title: ti.trim(), time: tm });
+        break;
       }
     }
 
-    // Return if we found at least 2 tracks (some short sets only have a few)
-    if (tracks.length >= 2) return tracks;
-    return [];
+    // Need at least 2 lines to call it a tracklist
+    return tracks.length >= 2 ? tracks : [];
   }
 
   function displayTracklist(tracks) {
@@ -858,7 +997,7 @@
           <span class="track-num">${String(i + 1).padStart(2, '0')}</span>
           <div class="track-info">
             <div class="track-artist">${escapeHtml(t.artist)}</div>
-            <div class="track-title">${escapeHtml(t.title)}</div>
+            ${t.title ? `<div class="track-title">${escapeHtml(t.title)}</div>` : ''}
           </div>
           ${t.time ? `<span class="track-time">${t.time}</span>` : ''}
         </li>
@@ -882,7 +1021,7 @@
 
     const text = currentTracks
       .filter(t => !t.source)
-      .map((t, i) => `${i + 1}. ${t.artist} - ${t.title}${t.time ? ' [' + t.time + ']' : ''}`)
+      .map((t, i) => `${i + 1}. ${t.artist}${t.title ? ' - ' + t.title : ''}${t.time ? ' [' + t.time + ']' : ''}`)
       .join('\n');
 
     const title = document.getElementById('videoTitle').textContent;
@@ -891,7 +1030,7 @@
     navigator.clipboard.writeText(full).then(() => {
       const btn = document.querySelector('.copy-btn');
       btn.textContent = '✅ Copied!';
-      setTimeout(() => { btn.textContent = '📋 Copy tracklist'; }, 2000);
+      setTimeout(() => { btn.textContent = '📋 Copy songs'; }, 2000);
     });
   }
 

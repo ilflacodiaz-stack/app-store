@@ -717,11 +717,11 @@
   let editingId = null;
   let activeTag = null;
 
-  // Sample recipes to start with
-  if (recipes.length === 0) {
-    recipes = [
+  function getDefaultRecipes() {
+    const now = Date.now();
+    return [
       {
-        id: Date.now(),
+        id: now,
         name: "Melanzane alla Parmigiana",
         emoji: "🍆",
         origin: "Italian",
@@ -730,12 +730,73 @@
         servings: "6",
         ingredients: "3 large eggplants\n500ml tomato sauce (passata)\n250g mozzarella\n100g parmigiano reggiano\nFresh basil\nOlive oil\nSalt\n2 eggs (optional, for coating)\nFlour (optional, for coating)",
         instructions: "1. Slice eggplants lengthwise, about 5mm thick\n2. Salt the slices and let them rest 30 min to release moisture\n3. Pat dry and either fry in olive oil or grill until golden\n4. In a baking dish, layer: tomato sauce, eggplant, mozzarella, parmigiano, basil\n5. Repeat layers until everything is used\n6. Top with tomato sauce, mozzarella, and parmigiano\n7. Bake at 180°C for 35-40 minutes until golden and bubbly\n8. Let it rest 15 minutes before serving — this is key!",
-        video: "",
+        video: "https://www.youtube.com/watch?v=rq1EUwiLa6M&t=131s",
         notes: "Gennaro's version is the best. Don't skip the resting time — it holds together much better. I prefer frying the eggplant over grilling, more flavor.",
-        createdAt: new Date().toISOString()
+        createdAt: new Date(now).toISOString()
+      },
+      {
+        id: now + 1,
+        name: "Minestrone",
+        emoji: "🍲",
+        origin: "Italian",
+        category: "Soup",
+        time: "45min",
+        servings: "4",
+        ingredients: "1 onion\n2 carrots\n2 celery stalks\n1 zucchini\n2 potatoes\n1 can tomatoes\n1 can cannellini beans\n1 liter vegetable stock\nSmall pasta or rice\nOlive oil\nParmigiano\nFresh basil",
+        instructions: "1. Dice the vegetables into small pieces\n2. Soften onion, carrot, and celery in olive oil\n3. Add zucchini, potatoes, tomatoes, beans, and stock\n4. Simmer until the vegetables are tender\n5. Add pasta or rice and cook until done\n6. Finish with olive oil, basil, and parmigiano",
+        video: "https://www.youtube.com/results?search_query=minestrone+soup+italian+recipe",
+        notes: "Simple, flexible, and perfect for using whatever vegetables are in the kitchen.",
+        createdAt: new Date(now + 1).toISOString()
+      },
+      {
+        id: now + 2,
+        name: "Soupe à l'oignon",
+        emoji: "🧅",
+        origin: "French",
+        category: "Soup",
+        time: "1h 15min",
+        servings: "4",
+        ingredients: "5 large onions\n50g butter\n1 tbsp olive oil\n1 liter beef or vegetable stock\n1 splash white wine\n1 baguette\nGruyère cheese\nThyme\nSalt\nBlack pepper",
+        instructions: "1. Slice the onions thinly\n2. Cook slowly with butter and olive oil until deeply golden\n3. Add wine and scrape the pan\n4. Add stock and thyme, then simmer\n5. Toast baguette slices\n6. Serve soup with bread and melted Gruyère on top",
+        video: "https://www.youtube.com/watch?v=r078bSTC1Zs",
+        notes: "A cozy French classic. The key is patience with the onions — let them caramelize slowly.",
+        createdAt: new Date(now + 2).toISOString()
       }
     ];
+  }
+
+  // Sample recipes to start with. These only appear automatically for a new
+  // visitor, or upgrade an older demo that only had Melanzane saved locally.
+  const DEMO_SEED_VERSION = '6';
+  const defaultRecipes = getDefaultRecipes();
+  const defaultRecipeNames = defaultRecipes.map(r => r.name);
+  const oldDefaultRecipeNames = ["Spaghetti al Pomodoro"];
+  const savedDemoVersion = localStorage.getItem('ricettario_demo_seed_version');
+
+  if (recipes.length === 0) {
+    recipes = defaultRecipes;
+    localStorage.setItem('ricettario_demo_seed_version', DEMO_SEED_VERSION);
     save();
+  } else {
+    const hasDemoRecipe = recipes.some(r =>
+      defaultRecipeNames.includes(r.name) || oldDefaultRecipeNames.includes(r.name)
+    );
+    const missingDefault = defaultRecipes.some(defaultRecipe =>
+      !recipes.some(r => (r.name || '').toLowerCase() === defaultRecipe.name.toLowerCase())
+    );
+
+    if (hasDemoRecipe && (savedDemoVersion !== DEMO_SEED_VERSION || missingDefault)) {
+      recipes = recipes.filter(r => !oldDefaultRecipeNames.includes(r.name));
+      recipes = recipes.map(r => r.name === "Melanzane alla Parmigiana" ? {
+        ...r,
+        video: "https://www.youtube.com/watch?v=rq1EUwiLa6M&t=131s"
+      } : r);
+      const existingNames = new Set(recipes.map(r => (r.name || '').toLowerCase()));
+      const missingDefaults = defaultRecipes.filter(r => !existingNames.has(r.name.toLowerCase()));
+      recipes = [...recipes, ...missingDefaults];
+      localStorage.setItem('ricettario_demo_seed_version', DEMO_SEED_VERSION);
+      save();
+    }
   }
 
   function save() {
