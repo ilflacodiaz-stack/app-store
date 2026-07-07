@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="description" content="Paste a YouTube DJ set or live concert link and find the songs.">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
 <title>Song Tracker — Song & Tracklist Finder</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
@@ -562,7 +565,7 @@
   </div>
 
   <div class="footer">
-    Built by Alfonso — <a href="https://github.com/ilflacodiaz-stack" target="_blank">vibe coded</a> with taste 🎵
+    Built by Alfonso — <a href="https://github.com/ilflacodiaz-stack" target="_blank" rel="noopener">vibe coded</a> with taste 🎵
   </div>
 </div>
 
@@ -601,7 +604,7 @@
 
   function extractVideoId(url) {
     const patterns = [
-      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+      /(?:youtube\.com\/watch\?(?:.*&)?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/shorts\/|music\.youtube\.com\/watch\?(?:.*&)?v=)([a-zA-Z0-9_-]{11})/,
       /^([a-zA-Z0-9_-]{11})$/
     ];
     for (const p of patterns) {
@@ -980,17 +983,17 @@
         <li class="track-item">
           <span class="track-num">🔗</span>
           <div class="track-info">
-            <div class="track-artist">${tracks[0].artist}</div>
+            <div class="track-artist">${escapeHtml(tracks[0].artist)}</div>
             <div class="track-title">
-              <a href="${tracks[0].source}" target="_blank" style="color: var(--accent); text-decoration: none;">
-                ${tracks[0].source}
+              <a href="${escapeAttr(tracks[0].source)}" target="_blank" rel="noopener" style="color: var(--accent); text-decoration: none;">
+                ${escapeHtml(tracks[0].source)}
               </a>
             </div>
           </div>
         </li>
       `;
       countEl.textContent = 'Link found';
-      badgeEl.innerHTML = `Source: <a href="${tracks[0].source}" target="_blank">1001Tracklists</a>`;
+      badgeEl.innerHTML = `Source: <a href="${escapeAttr(tracks[0].source)}" target="_blank" rel="noopener">1001Tracklists</a>`;
     } else {
       listEl.innerHTML = tracks.map((t, i) => `
         <li class="track-item">
@@ -999,12 +1002,12 @@
             <div class="track-artist">${escapeHtml(t.artist)}</div>
             ${t.title ? `<div class="track-title">${escapeHtml(t.title)}</div>` : ''}
           </div>
-          ${t.time ? `<span class="track-time">${t.time}</span>` : ''}
+          ${t.time ? `<span class="track-time">${escapeHtml(t.time)}</span>` : ''}
         </li>
       `).join('');
       countEl.textContent = `${tracks.length} tracks`;
       const source = tracks._source || 'YouTube description';
-      badgeEl.innerHTML = `Source: ${source}`;
+      badgeEl.textContent = `Source: ${source}`;
     }
 
     document.getElementById('tracklist').classList.add('visible');
@@ -1014,6 +1017,10 @@
     const div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
+  }
+
+  function escapeAttr(str) {
+    return escapeHtml(str).replace(/`/g, '&#96;');
   }
 
   function copyTracklist() {

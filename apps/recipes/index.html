@@ -6,6 +6,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0a0a0a">
+<meta name="description" content="A personal recipe collection with local saving, search, tags, notes, and cooking videos.">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
 <title>Ricettario — My Recipes</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
@@ -813,6 +815,20 @@
     return match ? match[1] : null;
   }
 
+  function escapeHtml(value) {
+    return String(value || '').replace(/[&<>"']/g, char => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    }[char]));
+  }
+
+  function escapeAttr(value) {
+    return escapeHtml(value).replace(/`/g, '&#96;');
+  }
+
   function getAllTags() {
     const tags = new Set();
     recipes.forEach(r => {
@@ -837,7 +853,7 @@
     const tags = getAllTags();
     const el = document.getElementById('tagsBar');
     el.innerHTML = tags.map(tag => `
-      <button class="tag-filter ${activeTag === tag ? 'active' : ''}" onclick="toggleTag('${tag}')">${tag}</button>
+      <button class="tag-filter ${activeTag === tag ? 'active' : ''}" data-tag="${escapeAttr(tag)}">${escapeHtml(tag)}</button>
     `).join('');
   }
 
@@ -853,7 +869,7 @@
 
     let filtered = recipes.filter(r => {
       const matchesSearch = !query ||
-        r.name.toLowerCase().includes(query) ||
+        (r.name || '').toLowerCase().includes(query) ||
         (r.origin || '').toLowerCase().includes(query) ||
         (r.category || '').toLowerCase().includes(query) ||
         (r.ingredients || '').toLowerCase().includes(query) ||
@@ -892,17 +908,17 @@
     grid.innerHTML = filtered.map(r => `
       <div class="recipe-card" onclick="showDetail('${r.id}')">
         <div class="recipe-card-header">
-          <div class="recipe-emoji">${r.emoji || '🍽️'}</div>
+          <div class="recipe-emoji">${escapeHtml(r.emoji || '🍽️')}</div>
           <div class="recipe-info">
-            <div class="recipe-name">${r.name}</div>
-            <div class="recipe-origin">${[r.origin, r.time].filter(Boolean).join(' · ')}</div>
+            <div class="recipe-name">${escapeHtml(r.name)}</div>
+            <div class="recipe-origin">${escapeHtml([r.origin, r.time].filter(Boolean).join(' · '))}</div>
           </div>
         </div>
-        ${r.notes ? `<div class="recipe-desc">${r.notes}</div>` : ''}
+        ${r.notes ? `<div class="recipe-desc">${escapeHtml(r.notes)}</div>` : ''}
         <div class="recipe-footer">
-          ${r.category ? `<span class="recipe-tag">${r.category}</span>` : ''}
+          ${r.category ? `<span class="recipe-tag">${escapeHtml(r.category)}</span>` : ''}
           ${r.video ? `<span class="recipe-tag has-video">📹 Video</span>` : ''}
-          ${r.servings ? `<span class="recipe-time">🍽️ ${r.servings} servings</span>` : ''}
+          ${r.servings ? `<span class="recipe-time">🍽️ ${escapeHtml(r.servings)} servings</span>` : ''}
         </div>
       </div>
     `).join('');
@@ -920,37 +936,37 @@
 
     document.getElementById('detailContent').innerHTML = `
       <div class="detail-title">
-        <div class="recipe-emoji">${r.emoji || '🍽️'}</div>
+        <div class="recipe-emoji">${escapeHtml(r.emoji || '🍽️')}</div>
         <div>
-          <h2>${r.name}</h2>
-          ${r.origin ? `<div class="origin">${r.origin}</div>` : ''}
+          <h2>${escapeHtml(r.name)}</h2>
+          ${r.origin ? `<div class="origin">${escapeHtml(r.origin)}</div>` : ''}
         </div>
       </div>
 
       <div class="detail-meta">
-        ${r.time ? `<div class="detail-meta-item">⏱️ ${r.time}</div>` : ''}
-        ${r.servings ? `<div class="detail-meta-item">🍽️ ${r.servings} servings</div>` : ''}
-        ${r.category ? `<div class="detail-meta-item">📁 ${r.category}</div>` : ''}
+        ${r.time ? `<div class="detail-meta-item">⏱️ ${escapeHtml(r.time)}</div>` : ''}
+        ${r.servings ? `<div class="detail-meta-item">🍽️ ${escapeHtml(r.servings)} servings</div>` : ''}
+        ${r.category ? `<div class="detail-meta-item">📁 ${escapeHtml(r.category)}</div>` : ''}
       </div>
 
       ${r.ingredients ? `
         <div class="detail-section">
           <h3>Ingredients</h3>
-          <div class="content">${r.ingredients}</div>
+          <div class="content">${escapeHtml(r.ingredients)}</div>
         </div>
       ` : ''}
 
       ${r.instructions ? `
         <div class="detail-section">
           <h3>Instructions</h3>
-          <div class="content">${r.instructions}</div>
+          <div class="content">${escapeHtml(r.instructions)}</div>
         </div>
       ` : ''}
 
       ${r.notes ? `
         <div class="detail-section">
           <h3>My Notes</h3>
-          <div class="content">${r.notes}</div>
+          <div class="content">${escapeHtml(r.notes)}</div>
         </div>
       ` : ''}
 
@@ -962,7 +978,7 @@
       ` : r.video ? `
         <div class="detail-section">
           <h3>Video</h3>
-          <a href="${r.video}" target="_blank" class="video-link">
+          <a href="${escapeAttr(r.video)}" target="_blank" rel="noopener" class="video-link">
             <span class="yt-icon">▶️</span>
             <span class="yt-text">Watch on YouTube</span>
           </a>
@@ -1107,6 +1123,11 @@
 
   // Search
   document.getElementById('searchInput').addEventListener('input', renderRecipes);
+  document.getElementById('tagsBar').addEventListener('click', event => {
+    const button = event.target.closest('[data-tag]');
+    if (!button) return;
+    toggleTag(button.dataset.tag);
+  });
 
   // Init
   renderAll();

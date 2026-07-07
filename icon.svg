@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Alfonso Apps icon">
+  <rect width="512" height="512" rx="112" fill="#0a0a0a"/>
+  <path d="M120 134c0-18 15-33 33-33h206c18 0 33 15 33 33v244c0 18-15 33-33 33H153c-18 0-33-15-33-33V134z" fill="#141414" stroke="#2a2a2a" stroke-width="12"/>
+  <circle cx="190" cy="188" r="34" fill="#8b5cf6"/>
+  <circle cx="322" cy="188" r="34" fill="#f97316"/>
+  <circle cx="190" cy="320" r="34" fill="#22c55e"/>
+  <path d="M294 296h56v56h-56z" fill="#3b82f6" rx="18"/>
+  <path d="M153 101h206c18 0 33 15 33 33v30H120v-30c0-18 15-33 33-33z" fill="#1c1c1c"/>
+</svg>

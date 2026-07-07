@@ -2,7 +2,8 @@
   "cleanUrls": true,
   "trailingSlash": false,
   "redirects": [
-    { "source": "/tastes", "destination": "https://v0-restaurant-favorites-map-alfonso-diazs-projects.vercel.app/tastes", "permanent": false }
+    { "source": "/tastes", "destination": "https://favorites-map.vercel.app/", "permanent": false },
+    { "source": "/apps/tastes", "destination": "https://favorites-map.vercel.app/", "permanent": false }
   ],
   "headers": [
     {
