@@ -942,8 +942,11 @@
       [new RegExp(`^\\s*(.+?)\\s*[-–—]\\s*(.+?)\\s*\\((${TS})\\)\\s*$`), 'time_last'],
       [new RegExp(`^\\s*(.+?)\\s*[-–—]\\s*(.+?)\\s*\\[(${TS})\\]\\s*$`), 'time_last'],
       // --- dash-less (single-artist concerts: "1. Song (0:00)", "0:00 Song", "1. Song") ---
+      [new RegExp(`^\\s*\\d{1,3}\\s*[-–—]\\s*(.+?)\\s+(${TS})\\s*$`), 'song_time'],
+      [new RegExp(`^\\s*\\d{1,3}[.)]\\s*(.+?)\\s+(${TS})\\s*$`), 'song_time'],
       [new RegExp(`^\\s*\\d{1,3}[.)]\\s*(.+?)\\s*[\\(\\[](${TS})[\\)\\]]\\s*$`), 'song_time'],
       [new RegExp(`^\\s*(${TS})\\s+(.+?)$`), 'time_song'],
+      [new RegExp(`^\\s*(.+?)\\s+(${TS})\\s*$`), 'song_time'],
       [new RegExp(`^\\s*\\d{1,3}[.)]\\s*(.+?)$`), 'song_only'],
     ];
 
