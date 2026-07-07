@@ -738,16 +738,16 @@
       },
       {
         id: now + 1,
-        name: "Minestrone",
-        emoji: "🍲",
-        origin: "Italian",
-        category: "Soup",
-        time: "45min",
-        servings: "4",
-        ingredients: "1 onion\n2 carrots\n2 celery stalks\n1 zucchini\n2 potatoes\n1 can tomatoes\n1 can cannellini beans\n1 liter vegetable stock\nSmall pasta or rice\nOlive oil\nParmigiano\nFresh basil",
-        instructions: "1. Dice the vegetables into small pieces\n2. Soften onion, carrot, and celery in olive oil\n3. Add zucchini, potatoes, tomatoes, beans, and stock\n4. Simmer until the vegetables are tender\n5. Add pasta or rice and cook until done\n6. Finish with olive oil, basil, and parmigiano",
-        video: "https://www.youtube.com/watch?v=alU_S3c8XBo&t=8s",
-        notes: "Simple, flexible, and perfect for using whatever vegetables are in the kitchen.",
+        name: "Boeuf Bourguignon",
+        emoji: "🍷",
+        origin: "French",
+        category: "Main",
+        time: "3h",
+        servings: "6",
+        ingredients: "1kg beef chuck, cut into large cubes\n150g bacon or pancetta\n2 carrots\n1 onion\n2 garlic cloves\n2 tbsp flour\n500ml red wine\n500ml beef stock\n2 tbsp tomato paste\n250g mushrooms\nPearl onions or small shallots\nButter\nOlive oil\nBay leaf\nThyme\nSalt\nBlack pepper",
+        instructions: "1. Brown the bacon in a heavy pot, then set aside\n2. Season and brown the beef well on all sides\n3. Add onion, carrots, and garlic, then cook until softened\n4. Stir in flour and tomato paste\n5. Add red wine, stock, bay leaf, and thyme\n6. Return the bacon, cover, and simmer gently for about 2-2.5 hours\n7. Cook mushrooms and pearl onions separately in butter\n8. Add them near the end and simmer until the beef is tender\n9. Taste, adjust salt and pepper, and serve with potatoes, rice, or crusty bread",
+        video: "https://www.youtube.com/watch?v=RBuUj16Jm3Y",
+        notes: "Classic French comfort food. Keep the simmer low and slow; the beef should be spoon-tender and the sauce glossy.",
         createdAt: new Date(now + 1).toISOString()
       },
       {
@@ -769,7 +769,7 @@
 
   // Sample recipes to start with. These only appear automatically for a new
   // visitor, or upgrade an older demo that only had Melanzane saved locally.
-  const DEMO_SEED_VERSION = '7';
+  const DEMO_SEED_VERSION = '8';
   const defaultRecipes = getDefaultRecipes();
   const defaultRecipeNames = defaultRecipes.map(r => r.name);
   const oldDefaultRecipeNames = ["Spaghetti al Pomodoro"];
@@ -793,9 +793,11 @@
         ...r,
         video: "https://www.youtube.com/watch?v=rq1EUwiLa6M&t=131s"
       } : r);
-      recipes = recipes.map(r => r.name === "Minestrone" ? {
-        ...r,
-        video: "https://www.youtube.com/watch?v=alU_S3c8XBo&t=8s"
+      const boeufDefault = defaultRecipes.find(r => r.name === "Boeuf Bourguignon");
+      recipes = recipes.map(r => r.name === "Minestrone" && boeufDefault ? {
+        ...boeufDefault,
+        id: r.id,
+        createdAt: r.createdAt
       } : r);
       const existingNames = new Set(recipes.map(r => (r.name || '').toLowerCase()));
       const missingDefaults = defaultRecipes.filter(r => !existingNames.has(r.name.toLowerCase()));
