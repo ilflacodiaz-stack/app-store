@@ -212,8 +212,33 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 24px;
+    position: relative;
+    overflow: hidden;
     margin-bottom: 16px;
+  }
+
+  .app-icon svg {
+    width: 28px;
+    height: 28px;
+    display: block;
+  }
+
+  .app-icon.song-logo {
+    background:
+      radial-gradient(circle at 32% 28%, rgba(139, 92, 246, 0.34), transparent 42%),
+      #221b35;
+  }
+
+  .app-icon.tastes-logo {
+    background:
+      radial-gradient(circle at 50% 18%, rgba(249, 115, 22, 0.32), transparent 44%),
+      #2b1d16;
+  }
+
+  .app-icon.recipe-logo {
+    background:
+      radial-gradient(circle at 35% 22%, rgba(34, 197, 94, 0.28), transparent 45%),
+      #16261a;
   }
 
   .app-card-header {
@@ -428,7 +453,14 @@
 
     <a href="/apps/dj-set-tracker/" class="app-card" style="--card-accent: var(--accent);" aria-label="Open Song Tracker">
       <div class="app-card-header">
-        <div class="app-icon" style="background: var(--accent-soft);">🎧</div>
+        <div class="app-icon song-logo" aria-hidden="true">
+          <svg viewBox="0 0 48 48" fill="none" role="img">
+            <path d="M12 27c0-9.4 5.1-16 12-16s12 6.6 12 16" stroke="#f5f3ff" stroke-width="3.6" stroke-linecap="round"/>
+            <path d="M13 28c0-2.8 2.2-5 5-5h1.2v13H18c-2.8 0-5-2.2-5-5v-3z" fill="#8b5cf6"/>
+            <path d="M35 28c0-2.8-2.2-5-5-5h-1.2v13H30c2.8 0 5-2.2 5-5v-3z" fill="#c4b5fd"/>
+            <path d="M22 34h4" stroke="#f5f3ff" stroke-width="3.2" stroke-linecap="round"/>
+          </svg>
+        </div>
         <span class="launch-arrow">↗</span>
       </div>
       <div class="app-name">Song Tracker</div>
@@ -442,7 +474,13 @@
 
     <a href="https://favorites-map.vercel.app/" class="app-card" style="--card-accent: var(--orange);" target="_blank" rel="noopener" aria-label="Open Tastes">
       <div class="app-card-header">
-        <div class="app-icon" style="background: rgba(249, 115, 22, 0.12);">📍</div>
+        <div class="app-icon tastes-logo" aria-hidden="true">
+          <svg viewBox="0 0 48 48" fill="none" role="img">
+            <path d="M24 41s12-10.2 12-21a12 12 0 1 0-24 0c0 10.8 12 21 12 21z" fill="#f97316"/>
+            <circle cx="24" cy="20" r="4.6" fill="#fff7ed"/>
+            <path d="M17 38c2.3 1.5 4.6 2.2 7 2.2s4.7-.7 7-2.2" stroke="#fed7aa" stroke-width="2.7" stroke-linecap="round"/>
+          </svg>
+        </div>
         <span class="launch-arrow">↗</span>
       </div>
       <div class="app-name">Tastes</div>
@@ -456,7 +494,14 @@
 
     <a href="/apps/recipes/" class="app-card" style="--card-accent: var(--green);" aria-label="Open Ricettario">
       <div class="app-card-header">
-        <div class="app-icon" style="background: rgba(34, 197, 94, 0.12);">👨‍🍳</div>
+        <div class="app-icon recipe-logo" aria-hidden="true">
+          <svg viewBox="0 0 48 48" fill="none" role="img">
+            <path d="M16 11h19c2.2 0 4 1.8 4 4v22c0 2.2-1.8 4-4 4H16c-2.2 0-4-1.8-4-4V15c0-2.2 1.8-4 4-4z" fill="#22c55e"/>
+            <path d="M18 11v30" stroke="#dcfce7" stroke-width="3.2" stroke-linecap="round"/>
+            <path d="M24 20h9M24 27h9M24 34h6" stroke="#052e16" stroke-width="3" stroke-linecap="round"/>
+            <path d="M18 8v6" stroke="#86efac" stroke-width="3.2" stroke-linecap="round"/>
+          </svg>
+        </div>
         <span class="launch-arrow">↗</span>
       </div>
       <div class="app-name">Ricettario</div>
