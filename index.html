@@ -212,6 +212,12 @@
       #2d2410;
   }
 
+  .app-icon.next-logo {
+    background:
+      radial-gradient(circle at 45% 24%, rgba(139, 92, 246, 0.24), transparent 42%),
+      #1c1c1c;
+  }
+
   .app-card-header {
     display: flex;
     justify-content: space-between;
@@ -271,6 +277,23 @@
   .tag-category {
     background: var(--surface-3);
     color: var(--text-dim);
+  }
+
+  .tag-wip {
+    background: rgba(249, 115, 22, 0.12);
+    color: var(--orange);
+  }
+
+  .app-card.coming-soon {
+    border-style: dashed;
+    opacity: 0.58;
+    cursor: default;
+  }
+
+  .app-card.coming-soon:hover {
+    transform: none;
+    border-color: var(--border);
+    box-shadow: none;
   }
 
   /* Footer */
@@ -394,6 +417,23 @@
         <span class="app-tag tag-category">Food</span>
       </div>
     </a>
+
+    <div class="app-card coming-soon">
+      <div class="app-card-header">
+        <div class="app-icon next-logo" aria-hidden="true">
+          <svg viewBox="0 0 48 48" fill="none" role="img">
+            <path d="M24 12v24M12 24h24" stroke="#c4b5fd" stroke-width="3.4" stroke-linecap="round"/>
+            <path d="M16.5 16.5l15 15M31.5 16.5l-15 15" stroke="#6d28d9" stroke-width="2.4" stroke-linecap="round" opacity="0.85"/>
+            <circle cx="24" cy="24" r="4.2" fill="#f5f3ff"/>
+          </svg>
+        </div>
+      </div>
+      <div class="app-name">What's next?</div>
+      <div class="app-desc">The next small app, once a personal problem deserves its own tool.</div>
+      <div class="app-meta">
+        <span class="app-tag tag-wip">Possible</span>
+      </div>
+    </div>
 
   </div>
 
