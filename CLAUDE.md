@@ -10,6 +10,7 @@ app-store/           ← this repo, deployed at Vercel
 └── apps/
     ├── dj-set-tracker/index.html
     ├── recipes/index.html
+    ├── bastiat/index.html  (+ PDF of the essay)
     └── tastes/index.html
 
 ../tracklist-api/    ← API for DJ Song Tracker (Vercel serverless)
@@ -24,6 +25,7 @@ app-store/           ← this repo, deployed at Vercel
 | Song Tracker | Purple `#8b5cf6` | Paste YouTube DJ set or live concert → get songs |
 | Tastes | Orange `#f97316` | Personal restaurant map |
 | Ricettario | Green `#22c55e` | Personal recipe collection |
+| Lo que se ve y lo que no se ve | Blue `#3b82f6` | Bastiat's essay (Spanish PDF) with source citation |
 
 ## AI Agents (all on Telegram)
 

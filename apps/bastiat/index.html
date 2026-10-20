@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Lo que se ve y lo que no se ve · Bastiat</title>
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<meta name="description" content="El ensayo de Frédéric Bastiat (1850), en español, para leer o descargar.">
+<meta property="og:title" content="Lo que se ve y lo que no se ve — Frédéric Bastiat">
+<meta property="og:description" content="El ensayo de 1850, en español. Para leer o descargar en PDF.">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  :root {
+    --bg: #0a0a0a; --card: #141414; --line: #2a2a2a;
+    --text: #f0f0f0; --muted: #888; --accent: #3b82f6;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    line-height: 1.55; -webkit-font-smoothing: antialiased;
+    padding: max(24px, env(safe-area-inset-top)) 16px 40px;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; }
+  .back { color: var(--muted); text-decoration: none; font-size: 14px; }
+  .back:hover { color: var(--text); }
+  .eyebrow { margin-top: 28px; color: var(--accent); font-size: 12px; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; }
+  h1 { font-family: Georgia, "Times New Roman", serif; font-weight: 400; font-size: clamp(30px, 7vw, 44px); line-height: 1.1; margin: 10px 0 8px; }
+  .author { color: var(--muted); font-size: 16px; }
+  .lede { margin-top: 22px; font-size: 17px; color: #d6d6d6; }
+  .lede em { font-family: Georgia, serif; }
+  .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 26px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 12px 18px; border-radius: 12px; font-size: 15px; font-weight: 600;
+    text-decoration: none; border: 1px solid var(--line); color: var(--text); background: var(--card);
+  }
+  .btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .reader { margin-top: 28px; border: 1px solid var(--line); border-radius: 20px; overflow: hidden; background: var(--card); }
+  .reader iframe { display: block; width: 100%; height: 78vh; border: 0; background: #fff; }
+  .meta { margin-top: 28px; padding: 18px; border: 1px solid var(--line); border-radius: 20px; background: var(--card); font-size: 14px; color: var(--muted); }
+  .meta h2 { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--text); margin-bottom: 8px; }
+  .meta a { color: var(--text); }
+  footer { margin-top: 32px; color: var(--muted); font-size: 13px; text-align: center; }
+  @media (max-width: 600px) { .reader { display: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="/">← Alfonso's Apps</a>
+
+  <p class="eyebrow">Lectura · Economía</p>
+  <h1>Lo que se ve y lo que no se ve</h1>
+  <p class="author">Frédéric Bastiat · 1850</p>
+
+  <p class="lede">Un buen economista no se queda con el efecto inmediato de una medida: sigue también los efectos que no se ven. Bastiat lo muestra en doce casos breves, como <em>El cristal roto</em> o <em>Ahorro y lujo</em>.</p>
+
+  <div class="actions">
+    <a class="btn primary" href="lo-que-se-ve-y-lo-que-no-se-ve.pdf" target="_blank" rel="noopener">Leer el PDF ↗</a>
+    <a class="btn" href="lo-que-se-ve-y-lo-que-no-se-ve.pdf" download>Descargar</a>
+  </div>
+
+  <div class="reader">
+    <iframe src="lo-que-se-ve-y-lo-que-no-se-ve.pdf#view=FitH" title="Lo que se ve y lo que no se ve — PDF"></iframe>
+  </div>
+
+  <div class="meta">
+    <h2>Fuente</h2>
+    Extraído de Frédéric Bastiat, <em>Obras escogidas</em>, edición y estudio preliminar de Francisco Cabrillo, traducción de Pedro Andrés Rodríguez (Madrid: Unión Editorial, 2.ª ed., 2009). Publicado gratuitamente por el Cato Institute:
+    <a href="https://www.elcato.org/sites/default/files/obras-escogidas-facsimile.pdf" target="_blank" rel="noopener">elcato.org — Obras escogidas (PDF completo)</a>.
+  </div>
+
+  <footer>Built by Alfonso Diaz · Personal app store · 2026</footer>
+</div>
+</body>
+</html>
